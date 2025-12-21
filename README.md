@@ -1,7 +1,7 @@
 ## Setup Instructions
 ### Prerequisites
 
-Before proceeding, ensure that you're already familiar how [foss.crave.io](https://foss.crave.io) works and the original [workflow](https://github.com/sounddrill31/crave_aosp_builder).
+Before proceeding, ensure that you're already familiar with how [foss.crave.io](https://foss.crave.io) works and the original [workflow](https://github.com/sounddrill31/crave_aosp_builder).
 
 ### Steps
 
@@ -43,10 +43,39 @@ Before proceeding, ensure that you're already familiar how [foss.crave.io](https
    - On the right side, select "Run workflow".
      - Choose the base project.
      - If your ROM isn't listed, just `repo init` the ROM manifest within your build script (refer to existing [scripts](https://github.com/aosp-realm/android_build_scripts)).
-     - Enter your device codename and the build script to use (it must be a raw static url).
+     - Enter your device codename and the build script to use.
+     
+> [!CAUTION]
+> **DO NOT** use the standard URL for build script. You **MUST** use the Raw URL, otherwise the build will fail because it will download an HTML instead of your build commands.
 
 2. **Execute the Workflow:**
    - Run the workflow.
+
+## Setting Up Signing Keys (Optional)
+
+If you wish to build a signed ROM, you must provide your keys in a specific format to bypass GitHub's secret size limits and ensure the workflow stays automated.
+
+1. **Prepare your keys locally:**
+   - Navigate to your signing keys folder on your Linux machine and run:
+     ```bash
+     cd path/to/your/keys
+     tar -czpf keys.tar.gz *
+     base64 -w0 keys.tar.gz > keys.txt
+     ```
+
+2. **Host the keys:**
+   - Create a Secret Gist on GitHub ([gist.github.com](https://gist.github.com)).
+   - Paste the content of `keys.txt` into the Gist and save.
+   - Click the "Raw" button on the top right of the file view.
+   - Copy the resulting URL. It must look like: `https://gist.githubusercontent.com/.../raw/...`
+
+3. **Add the Secret:**
+   - In your repository, go to `Settings -> Secrets and Variables -> Actions`.
+   - Create a new secret named `KEYS_BASE64`.
+   - Paste the Raw Gist URL as the value.
+
+> [!CAUTION]
+> **DO NOT** use the standard Gist UI URL. You **MUST** use the Raw URL, otherwise the build will fail because the runner will download HTML instead of the base64 of your keys.
 
 ## Important Informations
 

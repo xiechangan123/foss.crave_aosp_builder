@@ -22,6 +22,10 @@ on:
        BUILD_SCRIPT:
         description: 'Build script raw URL:'
         required: true
+       KEYS_TARGET_PATH:
+        description: 'Path to extract signing keys (e.g., vendor/private/keys). Leave empty for unsigned build.'
+        required: false
+        default: ''
        BUILD_CLEAN:
         description: 'Build using a new/clean machine? (yes/no)'
         default: "no"
@@ -96,6 +100,21 @@ jobs:
         echo "DEVICE_CODENAME=${{ github.event.inputs.DEVICE_CODENAME }}" >> $GITHUB_ENV
         echo "Building on $PROJECTFOLDER project"
 
+    - name: Deploy signing keys
+      if: ${{ github.event.inputs.KEYS_TARGET_PATH }}
+      run: |
+        cd ${{ env.BUILD_DIR }}
+        
+        if [ -f keys.tar.gz ] && [ -s keys.tar.gz ]; then
+            echo "✅ keys.tar.gz already exists in devspace, skipping!"
+        else
+            echo "Creating keys.tar.gz..."
+            curl -sL "${{ secrets.KEYS_BASE64 }}" | base64 -d -i > keys.tar.gz
+            echo "✅ Signing keys deployed to devspace"
+        fi
+        
+        crave push -d "/tmp/src/android" "keys.tar.gz"
+
     - name: Set up persistent hostname
       run: |
         cd ${{ env.BUILD_DIR }}
@@ -115,9 +134,14 @@ jobs:
         [[ "${{ github.event.inputs.BUILD_CLEAN }}" == "yes" ]] && CLEAN_FLAG="--clean" || CLEAN_FLAG=""
 
         crave run $CLEAN_FLAG --no-patch -- "
+          [[ -z '${{ github.event.inputs.KEYS_TARGET_PATH }}' ]] && rm -f keys.tar.gz
+          if [ -f keys.tar.gz ] && [ -n '${{ github.event.inputs.KEYS_TARGET_PATH }}' ]; then
+              mkdir -p '${{ github.event.inputs.KEYS_TARGET_PATH }}'
+              tar -xzpf keys.tar.gz -C '${{ github.event.inputs.KEYS_TARGET_PATH }}'
+          fi
           rm -f out/target/product/${{ env.DEVICE_CODENAME }}/*.zip out/target/product/${{ env.DEVICE_CODENAME }}/*sum
           rm -rf .repo/local_manifests
-          curl -s ${{ github.event.inputs.BUILD_SCRIPT }} | bash
+          curl -sL ${{ github.event.inputs.BUILD_SCRIPT }} | bash
         "
 
     - name: Error Log
