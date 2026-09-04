@@ -15,11 +15,11 @@ on:
         
 jobs:
   run-devspace-and-tmux:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v7
 
       # Download and configure 'crave'.
     - name: Configure the 'crave' environment
