@@ -1,4 +1,4 @@
 aosp:
   ignoreClientHostname: true
-LOS 22.1:
+LOS 23.2:
   ignoreClientHostname: true
