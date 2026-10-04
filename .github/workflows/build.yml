@@ -162,7 +162,7 @@ jobs:
         rm -rf *.zip *.sha256sum *.md5sum *.img out ${{ env.DEVICE_CODENAME }}*json ${{ env.DEVICE_CODENAME }}*txt
 
         crave pull 'out/target/product/${{ env.DEVICE_CODENAME }}/*.zip'
-        rm -f *-ota-*.zip *-eng*.zip lineage*ota.zip aosp*ota.zip statix*ota.zip
+        rm -f *-ota-*.zip *-eng*.zip lineage*ota.zip statix*ota.zip
 
         if [ -z "$(find . -maxdepth 1 -name '*.zip' | sed 's|^\./||')" ]; then
             echo -e '\e[31mERROR! The build might have failed, cancelled, or the runner died!\e[0m'
