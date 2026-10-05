@@ -54,7 +54,7 @@ jobs:
       id: proj-variables
       run: |
         case "${{ github.event.inputs.BASE_PROJECT }}" in
-          "LineageOS") export PROJECTFOLDER="/crave-devspaces/LineageOS23"; export PROJECTID="99";;
+          "LineageOS") export PROJECTFOLDER="/crave-devspaces/LineageOS23.2"; export PROJECTID="99";;
         esac
         
         echo "PROJECTFOLDER=$PROJECTFOLDER" >> $GITHUB_ENV
